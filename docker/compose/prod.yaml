@@ -41,7 +41,7 @@ services:
     volumes:
       - ../../docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ../../docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ../../docker/nginx/conf.d/default-https.conf:/etc/nginx/conf.d/https.conf.template:ro
+      - ../../docker/nginx/conf.d/default-https.conf:/etc/nginx/conf.d/https.conf:ro
       - certbot_www:/var/www/certbot:ro
       - certbot_conf:/etc/letsencrypt:ro
       - nginx_cache:/var/cache/nginx
