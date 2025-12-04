@@ -1,0 +1,119 @@
+{% extends 'pages/layouts/base.html' %}
+
+{% block title %}Home - Ishflow{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="{% if user.is_authenticated and user.is_employee %}bg-success{% else %}bg-primary{% endif %} text-white py-5">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="display-4 fw-bold mb-3">Streamline Your Recruitment</h1>
+                <p class="lead mb-4">Centralize job posting, application tracking, and interview scheduling in one powerful platform.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    {% if user.is_authenticated %}
+                        <a href="{% if user.is_candidate %}{% url 'jobs:list' %}{% else %}{% url 'jobs:create' %}{% endif %}" class="btn btn-light btn-lg">
+                            <i class="bi bi-{% if user.is_candidate %}search{% else %}plus-circle{% endif %} me-2"></i>
+                            {% if user.is_candidate %}Browse Jobs{% else %}Post a Job{% endif %}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">
+                            <i class="bi bi-person-plus me-2"></i>Get Started
+                        </a>
+                        <a href="{% url 'jobs:list' %}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-search me-2"></i>Browse Jobs
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-5 text-center mt-4 mt-lg-0">
+                <i class="bi bi-clipboard-check-fill" style="font-size: 8rem;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container py-5">
+        <h2 class="text-center fw-bold mb-5">Why Choose Ishflow?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-briefcase-fill text-primary display-4 mb-3"></i>
+                        <h5 class="mb-3">Job Posting</h5>
+                        <p class="text-muted">Post and manage all your job openings from one centralized location.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-file-earmark-text-fill text-success display-4 mb-3"></i>
+                        <h5 class="mb-3">Application Tracking</h5>
+                        <p class="text-muted">Track applications from submission to hire with status updates.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-calendar-event-fill text-info display-4 mb-3"></i>
+                        <h5 class="mb-3">Interview Scheduling</h5>
+                        <p class="text-muted">Schedule interviews with built-in calendar integration.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="bg-light py-5">
+    <div class="container py-5">
+        <h2 class="text-center fw-bold mb-5">How It Works</h2>
+        <div class="row g-4">
+            <div class="col-lg-4 text-center">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                    <span class="h2 mb-0">1</span>
+                </div>
+                <h5 class="mb-3">Create Account</h5>
+                <p class="text-muted">Sign up as a company or candidate in minutes.</p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                    <span class="h2 mb-0">2</span>
+                </div>
+                <h5 class="mb-3">Post or Apply</h5>
+                <p class="text-muted">Companies post jobs, candidates submit applications.</p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                    <span class="h2 mb-0">3</span>
+                </div>
+                <h5 class="mb-3">Manage & Hire</h5>
+                <p class="text-muted">Track applications and schedule interviews easily.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+{% if not user.is_authenticated %}
+<section class="py-5">
+    <div class="container py-5 text-center">
+        <h2 class="fw-bold mb-3">Ready to Get Started?</h2>
+        <p class="lead text-muted mb-4">Join companies and candidates using Ishflow today.</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{% url 'accounts:register' %}?type=employer" class="btn btn-primary btn-lg">
+                <i class="bi bi-building me-2"></i>I'm an Employer
+            </a>
+            <a href="{% url 'accounts:register' %}?type=candidate" class="btn btn-outline-primary btn-lg">
+                <i class="bi bi-person me-2"></i>I'm a Candidate
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

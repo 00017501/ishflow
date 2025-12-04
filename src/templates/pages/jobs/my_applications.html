@@ -1,0 +1,135 @@
+{% extends 'pages/layouts/base.html' %}
+{% load static %}
+
+{% block title %}My Applications - Ishflow{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2">My Applications</h1>
+                <a href="{% url 'jobs:list' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-search"></i> Browse Jobs
+                </a>
+            </div>
+
+            {% if applications %}
+                <div class="row">
+                    {% for application in applications %}
+                    <div class="col-12 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title">
+                                            <a href="{% url 'jobs:detail' application.post.pk %}" class="text-decoration-none">
+                                                {{ application.post.title }}
+                                            </a>
+                                        </h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                            <i class="bi bi-building"></i> {{ application.post.company.name }}
+                                        </h6>
+                                    </div>
+                                    <span class="badge
+                                        {% if application.status == 'applied' %}bg-primary
+                                        {% elif application.status == 'under_review' %}bg-info
+                                        {% elif application.status == 'interview_scheduled' %}bg-warning
+                                        {% elif application.status == 'offered' %}bg-success
+                                        {% elif application.status == 'rejected' %}bg-danger
+                                        {% endif %}">
+                                        {{ application.get_status_display }}
+                                    </span>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="text-muted small">
+                                            <i class="bi bi-geo-alt"></i> {{ application.post.location }}
+                                        </div>
+                                        <div class="text-muted small mt-1">
+                                            <i class="bi bi-briefcase"></i> {{ application.post.get_type_display }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 text-md-end">
+                                        <div class="text-muted small">
+                                            <i class="bi bi-clock"></i> Applied {{ application.created_at|timesince }} ago
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if application.cover_letter %}
+                                <div class="mt-3">
+                                    <p class="mb-0 text-muted small">
+                                        <strong>Cover Letter:</strong> {{ application.cover_letter|truncatewords:20 }}
+                                    </p>
+                                </div>
+                                {% endif %}
+
+                                <div class="mt-3">
+                                    <a href="{% url 'jobs:detail' application.post.pk %}" class="btn btn-sm btn-outline-primary">
+                                        View Job <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                    {% if application.interviews.exists %}
+                                        {% with interview=application.interviews.first %}
+                                            {% if interview.slots.exists %}
+                                            <a href="{% url 'interviews:view_slots' application.pk %}" class="btn btn-sm btn-info">
+                                                <i class="bi bi-calendar-event"></i> View Interview Slots ({{ interview.slots.count }})
+                                            </a>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if applications.has_other_pages %}
+                <nav aria-label="Applications pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if applications.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ applications.previous_page_number }}">
+                                Previous
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in applications.paginator.page_range %}
+                            {% if applications.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > applications.number|add:'-3' and num < applications.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if applications.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ applications.next_page_number }}">
+                                Next
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle"></i> You haven't applied to any jobs yet.
+                    <a href="{% url 'jobs:list' %}" class="alert-link">Browse available jobs</a> to get started.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

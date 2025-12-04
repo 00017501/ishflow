@@ -1,0 +1,117 @@
+{% extends 'pages/layouts/base.html' %}
+
+{% block title %}Candidate Profile - Ishflow{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            {% include 'shared/components/profile_sidebar.html' with active_tab='candidate' %}
+        </div>
+
+        <div class="col-md-9">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0"><i class="bi bi-file-person me-2"></i>Candidate Profile</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Professional Bio</label>
+                            {{ form.bio }}
+                            {% if form.bio.errors %}<div class="invalid-feedback d-block">{{ form.bio.errors }}</div>{% endif %}
+                            {% if form.bio.help_text %}<small class="text-muted">{{ form.bio.help_text }}</small>{% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            {{ form.location }}
+                            {% if form.location.errors %}<div class="invalid-feedback d-block">{{ form.location.errors }}</div>{% endif %}
+                        </div>
+
+                        <hr class="my-4">
+                        <h5 class="mb-3">Professional Information</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Current Job Title</label>
+                                {{ form.current_title }}
+                                {% if form.current_title.errors %}<div class="invalid-feedback d-block">{{ form.current_title.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Years of Experience</label>
+                                {{ form.years_of_experience }}
+                                {% if form.years_of_experience.errors %}<div class="invalid-feedback d-block">{{ form.years_of_experience.errors }}</div>{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Skills</label>
+                            {{ form.skills }}
+                            {% if form.skills.errors %}<div class="invalid-feedback d-block">{{ form.skills.errors }}</div>{% endif %}
+                            {% if form.skills.help_text %}<small class="text-muted">{{ form.skills.help_text }}</small>{% endif %}
+                        </div>
+
+                        <hr class="my-4">
+                        <h5 class="mb-3">Salary Expectations</h5>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Currency</label>
+                                {{ form.salary_currency }}
+                                {% if form.salary_currency.errors %}<div class="invalid-feedback d-block">{{ form.salary_currency.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Minimum</label>
+                                {{ form.desired_salary_min }}
+                                {% if form.desired_salary_min.errors %}<div class="invalid-feedback d-block">{{ form.desired_salary_min.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Maximum</label>
+                                {{ form.desired_salary_max }}
+                                {% if form.desired_salary_max.errors %}<div class="invalid-feedback d-block">{{ form.desired_salary_max.errors }}</div>{% endif %}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+                        <h5 class="mb-3">Documents</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">Resume/CV</label>
+                            {% if candidate_profile.resume %}
+                            <div class="mb-2">
+                                <a href="{{ candidate_profile.resume.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-file-earmark-pdf me-1"></i>View Current Resume
+                                </a>
+                            </div>
+                            {% endif %}
+                            {{ form.resume }}
+                            {% if form.resume.errors %}<div class="invalid-feedback d-block">{{ form.resume.errors }}</div>{% endif %}
+                            {% if form.resume.help_text %}<small class="text-muted">{{ form.resume.help_text }}</small>{% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Cover Letter</label>
+                            {{ form.cover_letter }}
+                            {% if form.cover_letter.errors %}<div class="invalid-feedback d-block">{{ form.cover_letter.errors }}</div>{% endif %}
+                            {% if form.cover_letter.help_text %}<small class="text-muted">{{ form.cover_letter.help_text }}</small>{% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-1"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

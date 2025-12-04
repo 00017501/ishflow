@@ -1,0 +1,19 @@
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Profile Settings</h5>
+    </div>
+    <div class="list-group list-group-flush">
+        <a href="{% url 'accounts:profile' %}" class="list-group-item list-group-item-action {% if active_tab == 'basic' %}active{% endif %}">
+            <i class="bi bi-person me-2"></i>Basic Info
+        </a>
+        {% if user.is_candidate %}
+        <a href="{% url 'accounts:candidate_profile' %}" class="list-group-item list-group-item-action {% if active_tab == 'candidate' %}active{% endif %}">
+            <i class="bi bi-file-person me-2"></i>Candidate Profile
+        </a>
+        {% elif user.is_employee and user.company %}
+        <a href="{% url 'accounts:company_profile' %}" class="list-group-item list-group-item-action {% if active_tab == 'company' %}active{% endif %}">
+            <i class="bi bi-building me-2"></i>Company Profile
+        </a>
+        {% endif %}
+    </div>
+</div>

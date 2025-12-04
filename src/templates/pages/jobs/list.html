@@ -1,0 +1,134 @@
+{% extends 'pages/layouts/base.html' %}
+
+{% block title %}Browse Jobs - Ishflow{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Browse Jobs</h2>
+        {% if request.user.is_authenticated and request.user.is_employee %}
+        <a href="{% url 'jobs:my_jobs' %}" class="btn btn-outline-primary">
+            <i class="bi bi-briefcase me-1"></i>My Jobs
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="q" placeholder="Search jobs..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="type">
+                        <option value="">All Types</option>
+                        <option value="full_time" {% if job_type == 'full_time' %}selected{% endif %}>Full Time</option>
+                        <option value="part_time" {% if job_type == 'part_time' %}selected{% endif %}>Part Time</option>
+                        <option value="contract" {% if job_type == 'contract' %}selected{% endif %}>Contract</option>
+                        <option value="intern" {% if job_type == 'intern' %}selected{% endif %}>Intern</option>
+                        <option value="freelance" {% if job_type == 'freelance' %}selected{% endif %}>Freelance</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" name="location" placeholder="Location" value="{{ location }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search me-1"></i>Search
+                    </button>
+                </div>
+                {% if search_query or job_type or location %}
+                <div class="col-12">
+                    <a href="{% url 'jobs:list' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Clear Filters
+                    </a>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Job Listings -->
+    {% if jobs %}
+        {% for job in jobs %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h5 class="mb-1">
+                            <a href="{% url 'jobs:detail' job.pk %}" class="text-decoration-none">{{ job.title }}</a>
+                        </h5>
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-building me-1"></i>{{ job.company.name }}
+                        </p>
+                    </div>
+                    <span class="badge bg-primary">{{ job.get_type_display }}</span>
+                </div>
+
+                <p class="mb-2">{{ job.description|truncatewords:25 }}</p>
+
+                <div class="d-flex justify-content-between align-items-center text-muted small">
+                    <div>
+                        <i class="bi bi-geo-alt me-1"></i>{{ job.location }}
+                        {% if job.salary_min and job.salary_max %}
+                        <span class="ms-3">
+                            <i class="bi bi-cash me-1"></i>${{ job.salary_min|floatformat:0 }} - ${{ job.salary_max|floatformat:0 }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <span><i class="bi bi-clock me-1"></i>{{ job.created_at|timesince }} ago</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav aria-label="Job pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">Previous</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if get_params %}&{{ get_params }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">Next</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>No jobs found.
+            {% if search_query or job_type or location %}
+            <a href="{% url 'jobs:list' %}" class="alert-link">Clear filters</a> to see all jobs.
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

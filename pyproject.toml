@@ -1,0 +1,266 @@
+[project]
+name = "ishflow"
+version = "0.1.0"
+description = "Ishflow"
+requires-python = ">=3.13"
+dependencies = [
+    "django>=5.2.8",
+    "django-axes>=8.0.0",
+    "django-cachalot>=2.8.0",
+    "django-cors-headers>=4.9.0",
+    "django-environ>=0.12.0",
+    "django-filter>=25.2",
+    "django-import-export>=4.3.14",
+    "django-redis>=6.0.0",
+    "django-storages[boto3]>=1.14.6",
+    "django-unfold>=0.72.0",
+    "djangorestframework>=3.16.1",
+    "djangorestframework-simplejwt>=5.5.1",
+    "drf-spectacular>=0.29.0",
+    "drf-spectacular-sidecar>=2025.10.1",
+    "gunicorn>=23.0.0",
+    "httpx>=0.28.1",
+    "humanize>=4.14.0",
+    "phonenumbers>=9.0.19",
+    "pillow>=12.0.0",
+    "psycopg[binary,pool]>=3.2.13",
+    "pydantic[email]>=2.12.5",
+    "werkzeug>=3.1.4",
+    "whitenoise>=6.11.0",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.9.0",
+    "django-debug-toolbar>=6.1.0",
+    "django-extensions>=4.1",
+    "django-query-counter>=0.4.1",
+    "django-stubs>=5.2.7",
+    "djangorestframework-stubs>=3.16.5",
+    "factory-boy>=3.3.3",
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.2",
+    "pytest-django>=4.11.1",
+    "ruff>=0.14.3",
+    "watchdog>=6.0.0",
+]
+
+
+# Configure Ruff for linting and formatting
+[tool.ruff]
+# Target Python version
+target-version = "py313"
+
+# Line length is set to 120 (same as Black default)
+line-length = 120
+
+# Enable autofix for all enabled rules by default
+fix = false
+
+# Exclude directories and files
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "static",
+    "assets",
+    "node_modules",
+    "venv",
+    "migrations",
+    "**/migrations/**",
+    "**/apps/**/apps.py",
+]
+
+
+# Configure formatting
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint]
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Select rules to enable
+select = [
+    # pycodestyle
+    "E", # Error
+    "W", # Warning
+
+    # Pyflakes
+    "F", # Pyflakes rules
+
+    # Docstring rules
+    "D", # pydocstyle - enforce docstring conventions
+
+    # Additional recommended practices
+    "ERA", # Find commented-out code
+    "TID", # Check import tidiness
+    "ARG", # Detect unused function arguments
+    "DTZ", # Datetime best practices
+    "FIX", # Detect FIXMEs and TODOs
+    "PL",  # Pylint rules
+
+    # isort
+    "I", # Import sorting
+
+    # flake8-bugbear
+    "B", # Bug detection
+
+    # flake8-quotes
+    "Q", # String quotes consistency
+
+    # flake8-comprehensions
+    "C4", # Better comprehensions
+
+    # pyupgrade
+    "UP", # Code modernization
+
+    # pep8-naming
+    "N", # Naming conventions
+
+    # flake8-simplify
+    "SIM", # Code simplifications
+
+    # flake8-return
+    "RET", # Return statement consistency
+
+    # flake8-use-pathlib
+    "PTH", # Use pathlib instead of os.path
+
+    # Code complexity
+    "C90", # McCabe complexity
+
+    # Bandit security checks
+    "S", # Security issues
+
+    # Ruff-specific rules
+    "RUF",
+
+    # Type annotation checks
+    "ANN", # Type annotations for functions
+
+]
+
+# Ignore specific rules
+ignore = [
+    # Allow non-abstract empty methods in abstract base classes
+    "B027",
+
+    # Allow boolean positional values in function calls, like `dict.get(x, False)`
+    "FBT003",
+
+    # Allow print statements (consider enabling in production code)
+    "T201",
+
+    # Multi-line docstring summary should start at the second line
+    "D213",
+
+    # Allow optional docstring in __init__ method of a class
+    "D107",
+
+    # Disable check for mutable default values in class attributes.
+    "RUF012",
+]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["A", "B", "C", "D", "E", "F", "I"]
+unfixable = []
+
+# Configure isort rules
+[tool.ruff.lint.isort]
+lines-between-types = 1
+lines-after-imports = 2
+known-first-party = ["src"]
+combine-as-imports = true
+split-on-trailing-comma = false
+section-order = [
+    'future',
+    'standard-library',
+    'third-party',
+    'django',
+    'first-party',
+    'local-folder',
+]
+
+
+# Configure Pylint rules
+[tool.ruff.lint.pylint]
+# Maximum number of statements allowed for a function or method body
+# This helps to keep methods manageable and maintainable
+max-statements = 50
+
+# Configure flake8-quotes
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "double"
+multiline-quotes = "double"
+
+# Docstring rules
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+# Configure flake8-import-conventions
+[tool.ruff.lint.flake8-import-conventions]
+# Define preferred aliases for common imports
+[tool.ruff.lint.flake8-import-conventions.aliases]
+numpy = "np"
+pandas = "pd"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/conftest.py" = ["E402"]
+"src/apps/*/migrations/*.py" = ["D101", "E501", "RUF012"]
+"__init__.py" = ["D104"]
+"*/__init__.py" = ["D104"]
+"src/routes/*/urls.py" = ["D100"]
+
+
+# Configure Black formatting
+[tool.black]
+# Set the line length to 120 to match the default from Ruff
+line-length = 120
+
+# Enable trailing commas for collections (e.g., lists, dicts)
+skip-string-normalization = false # Keep string quotes as defined
+target-version = ["py313"]        # Match the Python version you're targeting
+
+# Enable formatting on function definitions (default is True)
+# This ensures function arguments are also formatted
+include = '\.py$' # Only format Python files
+exclude = '''
+(
+    /(
+        .git|
+        .tox|
+        .nox|
+        .coverage|
+        .hypothesis|
+        .pytest_cache|
+        build|
+        dist|
+        migrations|
+        tests|
+        venv|
+        .venv|
+        __pycache__
+    )/
+)
+'''

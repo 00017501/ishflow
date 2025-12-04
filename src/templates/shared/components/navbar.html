@@ -1,0 +1,80 @@
+<nav class="navbar navbar-expand-lg navbar-dark {% if user.is_authenticated and user.is_employee %}bg-success{% else %}bg-primary{% endif %}">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'home:home' %}">
+            <i class="bi bi-briefcase-fill me-2"></i>Ishflow
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'jobs:list' %}">
+                        <i class="bi bi-search me-1"></i>Browse Jobs
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                    {% if user.is_candidate %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'jobs:my_applications' %}">
+                                <i class="bi bi-file-earmark-text me-1"></i>My Applications
+                            </a>
+                        </li>
+                    {% elif user.is_employee %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>Management
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'accounts:employees_list' %}">
+                                        <i class="bi bi-people me-1"></i>Employees
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'jobs:my_jobs' %}">
+                                        <i class="bi bi-briefcase me-1"></i>Job Posts
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'jobs:received_applications' %}">
+                                        <i class="bi bi-inbox me-1"></i>Applications
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>{{ user.full_name|default:user.email }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                    <i class="bi bi-person me-2"></i>Profile
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-light ms-2" href="{% url 'accounts:register' %}">
+                            <i class="bi bi-person-plus me-1"></i>Register
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

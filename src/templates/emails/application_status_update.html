@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Status Update - {{ job_title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="card shadow-sm mx-auto" style="max-width: 600px;">
+            <div class="card-header {% if status == 'offered' %}bg-success{% elif status == 'rejected' %}bg-danger{% elif status == 'interview_scheduled' %}bg-info{% else %}bg-primary{% endif %} text-white text-center py-4">
+                <h1 class="h3 mb-0">Application Status Update</h1>
+            </div>
+
+            <div class="card-body p-4">
+                <p>Hi {{ candidate_name }},</p>
+
+                <p>We have an update regarding your application for the <strong>{{ job_title }}</strong> position at <strong>{{ company_name }}</strong>.</p>
+
+                <div class="alert {% if status == 'offered' %}alert-success{% elif status == 'rejected' %}alert-danger{% elif status == 'interview_scheduled' %}alert-info{% else %}alert-primary{% endif %} border">
+                    <h5 class="alert-heading">Application Status</h5>
+                    <p><span class="badge {% if status == 'offered' %}bg-success{% elif status == 'rejected' %}bg-danger{% elif status == 'interview_scheduled' %}bg-info{% else %}bg-warning{% endif %}">{{ status_display }}</span></p>
+
+                    {% if status == 'offered' %}
+                        <p class="mb-0"><strong>Congratulations!</strong> We are pleased to offer you the position. Please review the offer details and respond at your earliest convenience.</p>
+                    {% elif status == 'rejected' %}
+                        <p class="mb-0">After careful consideration, we have decided to move forward with other candidates at this time. We appreciate your interest in our company and wish you the best in your job search.</p>
+                    {% elif status == 'interview_scheduled' %}
+                        <p class="mb-0">Great news! An interview has been scheduled. Please check your application for interview details and time slots.</p>
+                    {% endif %}
+                </div>
+
+                <div class="text-center my-4">
+                    <a href="{{ application_url }}" class="btn btn-primary btn-lg">View Application</a>
+                </div>
+
+                <p>Thank you for your interest in joining {{ company_name }}.</p>
+
+                <p class="mb-0">Best regards,<br>
+                <strong>{{ company_name }}</strong></p>
+            </div>
+
+            <div class="card-footer text-center text-muted small">
+                <p class="mb-1">This is an automated message from Ishflow. Please do not reply to this email.</p>
+                <p class="mb-0">&copy; {% now "Y" %} Ishflow. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

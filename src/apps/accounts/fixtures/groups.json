@@ -1,0 +1,62 @@
+{
+  "groups": [
+    {
+      "name": "Candidates",
+      "permissions": [
+        "accounts.view_userorm",
+        "accounts.change_userorm",
+        "jobs.view_jobpostorm",
+        "applications.add_applicationorm",
+        "applications.view_applicationorm",
+        "applications.change_applicationorm",
+        "applications.delete_applicationorm",
+        "candidates.add_candidateorm",
+        "candidates.view_candidateorm",
+        "candidates.change_candidateorm",
+        "interviews.view_intervieworm"
+      ]
+    },
+    {
+      "name": "Company Managers",
+      "permissions": [
+        "accounts.view_userorm",
+        "accounts.add_userorm",
+        "accounts.change_userorm",
+        "accounts.view_employees",
+        "jobs.add_jobpostorm",
+        "jobs.view_jobpostorm",
+        "jobs.change_jobpostorm",
+        "applications.view_applicationorm",
+        "applications.change_applicationorm",
+        "companies.view_companyorm",
+        "interviews.add_intervieworm",
+        "interviews.view_intervieworm",
+        "interviews.change_intervieworm"
+      ]
+    },
+    {
+      "name": "Company Owners",
+      "permissions": [
+        "accounts.view_userorm",
+        "accounts.add_userorm",
+        "accounts.change_userorm",
+        "accounts.delete_userorm",
+        "accounts.view_employees",
+        "accounts.invite_employees",
+        "accounts.manage_employees",
+        "jobs.add_jobpostorm",
+        "jobs.view_jobpostorm",
+        "jobs.change_jobpostorm",
+        "jobs.delete_jobpostorm",
+        "applications.view_applicationorm",
+        "applications.change_applicationorm",
+        "companies.view_companyorm",
+        "companies.change_companyorm",
+        "interviews.add_intervieworm",
+        "interviews.view_intervieworm",
+        "interviews.change_intervieworm",
+        "interviews.delete_intervieworm"
+      ]
+    }
+  ]
+}

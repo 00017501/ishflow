@@ -1,0 +1,143 @@
+name: "ishflow_api_service"
+
+x-base-api: &base-api
+  build:
+    context: ../../
+    dockerfile: docker/images/local/api.Dockerfile
+  working_dir: /app
+  env_file:
+    - ../../.env
+  volumes:
+    - ../../src:/app/src
+    - ../../public:/app/public
+    - ../../Makefile:/app/Makefile
+    - ../../manage.py:/app/manage.py
+    - ../../uv.lock:/app/uv.lock
+    - ../../pyproject.toml:/app/pyproject.toml
+  depends_on:
+    - postgres-db
+    - redis-db
+  networks:
+    - ishflow_network
+
+services:
+  api:
+    <<: *base-api
+    container_name: ishflow-service
+    command: ["make", "run_server_local"]
+    restart: always
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "manage.py", "check", "--deploy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  postgres-db:
+    environment:
+      POSTGRES_USER: ishflow
+      POSTGRES_DB: ishflow
+      POSTGRES_PASSWORD: ishflow
+    image: postgres:15.0-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data:rw
+    networks:
+      - ishflow_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ishflow -d ishflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis-db:
+    image: redis:7.0-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data:rw
+    networks:
+      - ishflow_network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # SMTP Server for local testing. Link: https://github.com/axllent/mailpit
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025" # Web UI
+      - "1025:1025" # SMTP server with STARTTLS
+    environment:
+      - MP_SMTP_AUTH_ACCEPT_ANY=1
+      - MP_SMTP_AUTH_ALLOW_INSECURE=1
+      - MP_SMTP_TLS=1
+    networks:
+      - ishflow_network
+
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8025/api/v1/info",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Self hosted S3 compatible storage. Link: https://github.com/minio/minio
+  minio:
+    image: minio/minio:latest
+    container_name: minio-service
+    ports:
+      - "9000:9000" # API
+      - "9001:9001" # Console
+    environment:
+      MINIO_ROOT_USER: ishflow
+      MINIO_ROOT_PASSWORD: ishflow123
+    volumes:
+      - minio_data:/data
+    networks:
+      - ishflow_network
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  createbuckets:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - ishflow_network
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 ishflow ishflow123;
+      /usr/bin/mc mb myminio/media --ignore-existing;
+      /usr/bin/mc mb myminio/static --ignore-existing;
+      /usr/bin/mc anonymous set download myminio/media;
+      /usr/bin/mc anonymous set download myminio/static;
+      exit 0;
+      "
+
+networks:
+  ishflow_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

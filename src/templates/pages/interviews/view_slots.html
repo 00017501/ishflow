@@ -1,0 +1,136 @@
+{% extends 'pages/layouts/base.html' %}
+{% load static %}
+
+{% block title %}Interview Slots - Ishflow{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Application Info -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">{{ application.post.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ application.post.company.name }}
+                    </h6>
+                    <span class="badge bg-info">{{ application.get_status_display }}</span>
+                </div>
+            </div>
+
+            <!-- Proposed Slots -->
+            {% if slots %}
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Proposed Interview Time Slots</h5>
+                        {% if application.status != 'offered' and application.status != 'rejected' %}
+                        <a href="{% url 'interviews:counter_propose' application.pk %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-calendar-plus"></i> Suggest Alternative Time
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        {% for slot in slots %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="card-title">
+                                            <i class="bi bi-calendar-event"></i>
+                                            {{ slot.start_time|date:"l, F d, Y" }}
+                                        </h6>
+                                        <p class="mb-2">
+                                            <i class="bi bi-clock"></i>
+                                            <strong>{{ slot.start_time|date:"g:i A" }} - {{ slot.end_time|date:"g:i A" }}</strong>
+                                        </p>
+
+                                        {% if slot.location %}
+                                        <p class="mb-1">
+                                            <i class="bi bi-geo-alt"></i> {{ slot.location }}
+                                        </p>
+                                        {% endif %}
+
+                                        {% if slot.meeting_link %}
+                                        <p class="mb-1">
+                                            <i class="bi bi-camera-video"></i>
+                                            <a href="{{ slot.meeting_link }}" target="_blank">{{ slot.meeting_link }}</a>
+                                        </p>
+                                        {% endif %}
+
+                                        {% if slot.notes %}
+                                        <p class="mb-1 mt-2">
+                                            <strong>Notes:</strong> {{ slot.notes }}
+                                        </p>
+                                        {% endif %}
+
+                                        <p class="mb-0 text-muted small mt-2">
+                                            Proposed by {{ slot.proposed_by.full_name }}
+                                            {% if slot.status == 'counter_proposed' %}(You){% endif %}
+                                        </p>
+                                    </div>
+
+                                    <div class="ms-3">
+                                        <span class="badge
+                                            {% if slot.status == 'proposed' %}bg-primary
+                                            {% elif slot.status == 'counter_proposed' %}bg-warning
+                                            {% elif slot.status == 'accepted' %}bg-success
+                                            {% elif slot.status == 'rejected' %}bg-secondary
+                                            {% endif %} mb-2">
+                                            {{ slot.get_status_display }}
+                                        </span>
+
+                                        {% if slot.status == 'proposed' or slot.status == 'counter_proposed' %}
+                                        <div class="d-flex flex-column gap-2 mt-2">
+                                            {% if slot.status == 'proposed' and request.user.is_candidate %}
+                                            <form method="post" action="{% url 'interviews:accept_slot' slot.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-success w-100">
+                                                    <i class="bi bi-check-circle"></i> Accept
+                                                </button>
+                                            </form>
+                                            <form method="post" action="{% url 'interviews:reject_slot' slot.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                                    <i class="bi bi-x-circle"></i> Reject
+                                                </button>
+                                            </form>
+                                            {% elif slot.status == 'counter_proposed' and request.user.is_employee %}
+                                            <div class="btn-group-vertical btn-group-sm mt-2" role="group">
+                                                <form method="post" action="{% url 'interviews:accept_counter_proposal' slot.pk %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Accept this time slot and schedule the interview?')">
+                                                        <i class="bi bi-check-circle"></i> Accept
+                                                    </button>
+                                                </form>
+                                                <form method="post" action="{% url 'interviews:reject_slot' slot.pk %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm mt-1" onclick="return confirm('Reject this time slot?')">
+                                                        <i class="bi bi-x-circle"></i> Reject
+                                                    </button>
+                                                </form>
+                                    </div>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle"></i> No interview slots have been proposed yet.
+                </div>
+            {% endif %}
+
+            <div class="mt-3">
+                <a href="{% url 'jobs:list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Job Listings
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

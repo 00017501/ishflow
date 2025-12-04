@@ -1,0 +1,139 @@
+{% extends 'pages/layouts/base.html' %}
+{% load static %}
+
+{% block title %}Suggest Alternative Time - Ishflow{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Application Info -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">{{ application.post.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ application.post.company.name }}
+                    </h6>
+                </div>
+            </div>
+
+            <!-- Existing Slots -->
+            {% if existing_slots %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Previously Proposed Slots</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for slot in existing_slots %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">
+                                        {{ slot.start_time|date:"M d, Y - g:i A" }} - {{ slot.end_time|date:"g:i A" }}
+                                    </h6>
+                                    <p class="mb-0 small text-muted">
+                                        By {{ slot.proposed_by.full_name }}
+                                    </p>
+                                </div>
+                                <span class="badge
+                                    {% if slot.status == 'proposed' %}bg-primary
+                                    {% elif slot.status == 'counter_proposed' %}bg-warning
+                                    {% elif slot.status == 'accepted' %}bg-success
+                                    {% elif slot.status == 'rejected' %}bg-secondary
+                                    {% endif %}">
+                                    {{ slot.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Counter-Propose Form -->
+            {% if application.status != 'offered' and application.status != 'rejected' %}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Suggest Alternative Time Slot</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        If the proposed times don't work for you, suggest an alternative time that works better.
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.start_time.id_for_label }}" class="form-label">
+                                    {{ form.start_time.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.start_time }}
+                                {% if form.start_time.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.start_time.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.end_time.id_for_label }}" class="form-label">
+                                    {{ form.end_time.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.end_time }}
+                                {% if form.end_time.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.end_time.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                {{ form.notes.label }}
+                            </label>
+                            {{ form.notes }}
+                            <div class="form-text">Optional: Explain why this time works better for you</div>
+                            {% if form.notes.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.notes.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'interviews:view_slots' application.pk %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-calendar-plus"></i> Suggest Time
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-warning" role="alert">
+                <i class="bi bi-exclamation-triangle"></i> Cannot suggest interview slots for applications with status: <strong>{{ application.get_status_display }}</strong>
+            </div>
+            <div class="mt-3">
+                <a href="{% url 'jobs:my_applications' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to My Applications
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

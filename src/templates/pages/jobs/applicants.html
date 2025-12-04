@@ -1,0 +1,231 @@
+{% extends 'pages/layouts/base.html' %}
+{% load static %}
+
+{% block title %}Applicants for {{ job.title }} - Ishflow{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h2">{{ job.title }}</h1>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-people"></i> {{ applications.paginator.count }} Application{{ applications.paginator.count|pluralize }}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'jobs:my_jobs' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> My Jobs
+                    </a>
+                    <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-outline-primary">
+                        <i class="bi bi-eye"></i> View Job
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filter by Status -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Filter Applicants</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="applied" {% if status_filter == 'applied' %}selected{% endif %}>Applied</option>
+                                <option value="under_review" {% if status_filter == 'under_review' %}selected{% endif %}>Under Review</option>
+                                <option value="interview_scheduled" {% if status_filter == 'interview_scheduled' %}selected{% endif %}>Interview Scheduled</option>
+                                <option value="offered" {% if status_filter == 'offered' %}selected{% endif %}>Offered</option>
+                                <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="skill" class="form-label">Skill</label>
+                            <input type="text" class="form-control" id="skill" name="skill"
+                                   placeholder="e.g., Python, Django" value="{{ skill_filter }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="title" class="form-label">Current Title</label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                   placeholder="e.g., Software Engineer" value="{{ title_search }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="min_experience" class="form-label">Min Experience (years)</label>
+                            <input type="number" class="form-control" id="min_experience" name="min_experience"
+                                   min="0" placeholder="0" value="{{ min_experience }}">
+                        </div>
+                        <div class="col-md-1">
+                            <label for="has_resume" class="form-label">Resume</label>
+                            <select class="form-select" id="has_resume" name="has_resume">
+                                <option value="">All</option>
+                                <option value="yes" {% if has_resume == 'yes' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-funnel"></i> Apply Filters
+                            </button>
+                            <a href="{% url 'jobs:applicants' job.pk %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Clear All
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Applicants List -->
+            {% if applications %}
+                <div class="row">
+                    {% for application in applications %}
+                    <div class="col-12 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="card-title">
+                                            {{ application.applicant.user.full_name }}
+                                        </h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                            <i class="bi bi-envelope"></i> {{ application.applicant.user.email }}
+                                        </h6>
+
+                                        {% if application.applicant.current_title %}
+                                        <p class="mb-1">
+                                            <strong>Current Title:</strong> {{ application.applicant.current_title }}
+                                        </p>
+                                        {% endif %}
+
+                                        {% if application.applicant.years_of_experience %}
+                                        <p class="mb-1">
+                                            <strong>Experience:</strong> {{ application.applicant.years_of_experience }} year{{ application.applicant.years_of_experience|pluralize }}
+                                        </p>
+                                        {% endif %}
+
+                                        {% if application.applicant.skills %}
+                                        <p class="mb-1">
+                                            <strong>Skills:</strong>
+                                            {% for skill in application.applicant.skills %}
+                                                <span class="badge bg-secondary me-1">{{ skill }}</span>
+                                            {% endfor %}
+                                        </p>
+                                        {% endif %}
+
+                                        {% if application.cover_letter %}
+                                        <div class="mt-3">
+                                            <p class="mb-0"><strong>Cover Letter:</strong></p>
+                                            <p class="text-muted">{{ application.cover_letter|truncatewords:50 }}</p>
+                                        </div>
+                                        {% endif %}
+
+                                        <div class="mt-2 text-muted small">
+                                            <i class="bi bi-clock"></i> Applied {{ application.created_at|timesince }} ago
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <!-- Status Badge -->
+                                        <div class="mb-3">
+                                            <span class="badge
+                                                {% if application.status == 'applied' %}bg-primary
+                                                {% elif application.status == 'under_review' %}bg-info
+                                                {% elif application.status == 'interview_scheduled' %}bg-warning
+                                                {% elif application.status == 'offered' %}bg-success
+                                                {% elif application.status == 'rejected' %}bg-danger
+                                                {% endif %}">
+                                                {{ application.get_status_display }}
+                                            </span>
+                                        </div>
+
+                                        <!-- Update Status Form -->
+                                        <form method="post" action="{% url 'jobs:application_status_update' application.pk %}">
+                                            {% csrf_token %}
+                                            <div class="mb-2">
+                                                <label for="status-{{ application.pk }}" class="form-label small">Update Status</label>
+                                                <select class="form-select form-select-sm" id="status-{{ application.pk }}" name="status">
+                                                    <option value="applied" {% if application.status == 'applied' %}selected{% endif %}>Applied</option>
+                                                    <option value="under_review" {% if application.status == 'under_review' %}selected{% endif %}>Under Review</option>
+                                                    <option value="interview_scheduled" {% if application.status == 'interview_scheduled' %}selected{% endif %}>Interview Scheduled</option>
+                                                    <option value="offered" {% if application.status == 'offered' %}selected{% endif %}>Offered</option>
+                                                    <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-sm btn-primary w-100">
+                                                <i class="bi bi-check-circle"></i> Update
+                                            </button>
+                                        </form>
+
+                                        <!-- Resume Download -->
+                                        {% if application.applicant.resume %}
+                                        <div class="mt-2">
+                                            <a href="{{ application.applicant.resume.url }}" class="btn btn-sm btn-outline-secondary w-100" target="_blank">
+                                                <i class="bi bi-file-earmark-pdf"></i> Download Resume
+                                            </a>
+                                        </div>
+                                        {% endif %}
+
+                                        <!-- Schedule Interview -->
+                                        <div class="mt-2">
+                                            <a href="{% url 'interviews:propose_slot' application.pk %}" class="btn btn-sm btn-outline-info w-100">
+                                                <i class="bi bi-calendar-check"></i> Schedule Interview
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if applications.has_other_pages %}
+                <nav aria-label="Applicants pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if applications.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ applications.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if skill_filter %}&skill={{ skill_filter }}{% endif %}{% if title_search %}&title={{ title_search }}{% endif %}{% if min_experience %}&min_experience={{ min_experience }}{% endif %}{% if has_resume %}&has_resume={{ has_resume }}{% endif %}">
+                                Previous
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in applications.paginator.page_range %}
+                            {% if applications.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > applications.number|add:'-3' and num < applications.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if skill_filter %}&skill={{ skill_filter }}{% endif %}{% if title_search %}&title={{ title_search }}{% endif %}{% if min_experience %}&min_experience={{ min_experience }}{% endif %}{% if has_resume %}&has_resume={{ has_resume }}{% endif %}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if applications.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ applications.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if skill_filter %}&skill={{ skill_filter }}{% endif %}{% if title_search %}&title={{ title_search }}{% endif %}{% if min_experience %}&min_experience={{ min_experience }}{% endif %}{% if has_resume %}&has_resume={{ has_resume }}{% endif %}">
+                                Next
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle"></i> No applications yet for this job.
+                    {% if status_filter %}
+                    <a href="{% url 'jobs:applicants' job.pk %}" class="alert-link">Clear filter</a> to see all applications.
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

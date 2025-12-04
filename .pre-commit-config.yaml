@@ -1,0 +1,139 @@
+exclude: |
+  (?x)^(
+    \.venv/|
+    __pycache__/|
+    \.pytest_cache/|
+    static/|
+    \.ruff_cache/|
+    \.mypy_cache/|
+    build/|
+    dist/|
+    \.git/|
+    node_modules/|
+    src/apps/shared/data/
+  )
+
+repos:
+  # Auto-walrus operator
+  - repo: https://github.com/MarcoGorelli/auto-walrus
+    rev: 0.3.4
+    hooks:
+      - id: auto-walrus
+        name: Auto-walrus operator conversion
+        description: Automatically convert assignments to walrus operator where beneficial
+        files: ^(src/|tests/)
+
+  # Black code formatter
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        name: Black code formatter
+        description: Format Python code with Black
+        language_version: python3.11
+        files: ^(src/|tests/)
+        args: ["--line-length=120"]
+
+  # Ruff linting and formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.7
+    hooks:
+      - id: ruff
+        name: Ruff linting
+        description: Run Ruff linter with auto-fix
+        files: ^(src/|tests/)
+        args: [--fix]
+        types_or: [python, pyi]
+
+  # SQL formatting (for raw SQL queries)
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 2.3.5
+    hooks:
+      - id: sqlfluff-lint
+        name: SQL linting
+        description: Lint SQL files for style and syntax issues
+        files: \.sql$
+      - id: sqlfluff-fix
+        name: SQL auto-fix
+        description: Auto-fix SQL style and syntax issues
+        files: \.sql$
+
+  # YAML/JSON/TOML formatting and validation
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-docstring-first
+        name: Check docstring placement
+        description: Ensure docstrings are placed first in Python modules
+        files: ^src/
+
+      - id: debug-statements
+        name: Check for debug statements
+        description: Detect forgotten debug statements (pdb, debugger, etc.)
+        files: ^src/
+
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+        description: Remove trailing whitespace from files
+        args: ["--markdown-linebreak-ext=md"]
+
+      - id: end-of-file-fixer
+        name: Fix end of files
+        description: Ensure files end with a newline
+
+      - id: check-yaml
+        name: Validate YAML files
+        description: Check YAML files for syntax errors
+
+      - id: check-json
+        name: Validate JSON files
+        description: Check JSON files for syntax errors
+
+      - id: check-toml
+        name: Validate TOML files
+        description: Check TOML files for syntax errors
+
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+        description: Detect merge conflict markers in files
+
+      - id: check-added-large-files
+        name: Check for large files
+        description: Prevent addition of large files to repository
+        args: ["--maxkb=500"]
+        exclude: ^.*\.(geojson)$
+
+      - id: check-case-conflict
+        name: Check filename case conflicts
+        description: Check for case-insensitive filename conflicts
+
+      - id: mixed-line-ending
+        name: Fix mixed line endings
+        description: Normalize line endings to LF
+        args: ["--fix=lf"]
+
+      - id: pretty-format-json
+        name: Format JSON files
+        description: Pretty-format JSON files with consistent indentation
+        args: ["--autofix", "--indent=2"]
+        exclude: ^\.vscode/
+
+  # Function blacklisting (prevent dangerous functions)
+  - repo: https://github.com/skorokithakis/blacklist-pre-commit-hook
+    rev: e2f070289d8eddcaec0b580d3bde29437e7c8221
+    hooks:
+      - id: blacklist
+        name: Blacklist dangerous functions
+        description: Prevent usage of dangerous functions like eval, exec, compile
+        args: ["--blacklisted-names=eval,exec", "--ignore=tests/"]
+        files: ^src/
+
+  # Typos detection
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.26.1
+    hooks:
+      - id: typos
+        name: Typos detection
+        description: Detect common typos in code and comments
+        files: ^src/
+        types_or: [python, markdown, text]

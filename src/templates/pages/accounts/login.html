@@ -1,0 +1,78 @@
+{% extends 'pages/layouts/base.html' %}
+
+{% block title %}Login - Ishflow Recruitment Portal{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold mb-2">Welcome Back</h2>
+                            <p class="text-muted">Login to your Ishflow account</p>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label for="id_email" class="form-label">{{ form.email.label }}</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_password" class="form-label">{{ form.password.label }}</label>
+                                {{ form.password }}
+                                {% if form.password.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.password.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3 d-flex justify-content-between align-items-center">
+                                <div class="form-check">
+                                    {{ form.remember_me }}
+                                    <label class="form-check-label" for="id_remember_me">
+                                        {{ form.remember_me.label }}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Non-field errors -->
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.non_field_errors.0 }}
+                                </div>
+                            {% endif %}
+
+                            <div class="d-grid gap-2 mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                                </button>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="text-center">
+                                <p class="mb-2">Don't have an account?</p>
+                                <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                    <a href="{% url 'accounts:register' %}?type=candidate" class="btn btn-outline-primary">
+                                        <i class="bi bi-person me-1"></i>Sign up as Candidate
+                                    </a>
+                                    <a href="{% url 'accounts:register' %}?type=employer" class="btn btn-outline-primary">
+                                        <i class="bi bi-building me-1"></i>Sign up as Employer
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

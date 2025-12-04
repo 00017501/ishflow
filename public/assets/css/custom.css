@@ -1,0 +1,90 @@
+/* Custom Styles for Ishflow */
+
+/* General */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Messages/Alerts animation */
+.alert {
+    animation: appearOutOfNowhere 1s ease-in;
+}
+
+@keyframes appearOutOfNowhere {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Card hover effects */
+.card {
+    transition: transform 0.5s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Button hover effects */
+.btn {
+    transition: all 0.5s ease;
+}
+
+/* Navbar improvements */
+.navbar-brand {
+    font-size: 1.5rem;
+    transition: opacity 0.25s ease;
+}
+
+.navbar-brand:hover {
+    opacity: 0.8;
+}
+
+.nav-link {
+    transition: color 0.2s ease;
+}
+
+/* Footer links */
+footer a {
+    transition: opacity 0.2s ease;
+}
+
+footer a:hover {
+    opacity: 0.7;
+}
+
+/* Social icons */
+footer a i {
+    font-size: 1.25rem;
+}
+
+/* Utility classes */
+.min-vh-100 {
+    min-height: 100vh;
+}
+
+/* Form focus states */
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Spacing utilities */
+.mt-custom {
+    margin-top: 2rem;
+}
+
+.mb-custom {
+    margin-bottom: 2rem;
+}
